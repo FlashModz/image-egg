@@ -1,0 +1,79 @@
+{
+  "Name": "FiveM",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": null,
+  "StartupCommand": "$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1 --library-path \"$(pwd)/alpine/usr/lib/v8/:$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/\" -- $(pwd)/alpine/opt/cfx-server/FXServer +set citizen_dir $(pwd)/alpine/opt/cfx-server/citizen/ +set sv_licenseKey {{FIVEM_LICENSE}} +set sv_maxplayers {{MAX_PLAYERS}} +set serverProfile default +set txAdminPort {{TXADMIN_PORT}} $( [ \"$TXADMIN_ENABLE\" == \"1\" ] || printf %s '+exec server.cfg' )",
+  "OnlineDetection": "succeeded. Welcome",
+  "StopCommand": "quit",
+  "InstallShell": "/bin/bash",
+  "InstallDockerImage": "debian:bookworm-slim",
+  "InstallScript": "#! /bin/bash\napt update\napt install -y tar xz-utils file jq git curl\nmkdir -p /mnt/server/resources\ncd /mnt/server\necho \"updating citizenfx resource files\"\ngit clone https://github.com/citizenfx/cfx-server-data.git /tmp\ncp -Rf /tmp/resources/* resources/\n\necho \"Set the link for download\"\nif [[ \"${FIVEM_VERSION}\" == \"\" ]]; then\n    echo -e \"You Need to set an version\"\n    exit 2\nelse\n    DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)\nfi\n\necho -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\ncurl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n\necho \"Extracting fivem files\"\nFILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\nif [ \"$FILETYPE\" == \"gzip\" ]; then\n    tar xzvf ${DOWNLOAD_LINK##*/}\nelif [ \"$FILETYPE\" == \"Zip\" ]; then\n    unzip ${DOWNLOAD_LINK##*/}\nelif [ \"$FILETYPE\" == \"XZ\" ]; then\n    tar xvf ${DOWNLOAD_LINK##*/}\nelse\n    echo -e \"unknown filetype. Exiting\"\n    exit 2\nfi\n\nrm -rf ${DOWNLOAD_LINK##*/} run.sh\n\nif [ -e server.cfg ]; then\n    echo \"Skipping downloading default server config file as one already exists\"\nelse\n    echo \"Downloading default fivem config\"\n    curl https://raw.githubusercontent.com/parkervcp/eggs/master/game_eggs/gta/fivem/server.cfg >>server.cfg\nfi\n\nmkdir -p logs/\necho \"install complete\"",
+  "ParseConfiguration": "[]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "FIVEM_LICENSE",
+      "DefaultValue": "",
+      "DisplayName": "Your Fivem License",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "MAX_PLAYERS",
+      "DefaultValue": "32",
+      "DisplayName": "Max Players",
+      "Description": "Set the fivem max players count for your server",
+      "AllowView": true,
+      "AllowEdit": false,
+      "Filter": null
+    },
+    {
+      "Key": "FIVEM_HOSTNAME",
+      "DefaultValue": "A New Server by Moonlight Panel",
+      "DisplayName": "Server Hostname",
+      "Description": "The name of your server that shows up in the public server browser",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "FIVEM_VERSION",
+      "DefaultValue": "8552-7b609f5f63ca1ef211abde2fc0dc0d0a90cd9202",
+      "DisplayName": "FiveM Build Version",
+      "Description": "The fivem version that is to be installed. - An example : 8552-7b609f5f63ca1ef211abde2fc0dc0d0a90cd9202 --> You can see all version from here - https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "TXADMIN_ENABLE",
+      "DefaultValue": "1",
+      "DisplayName": "Enable TxAdmin",
+      "Description": "Enable the TxAdmin panel to manage your FiveM Server.",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "TXADMIN_PORT",
+      "DefaultValue": "40120",
+      "DisplayName": "TxAdmin Port",
+      "Description": "You can connect to your TX admin at this URL : https://panel.flashmodz.fr:(YOUR PORT)",
+      "AllowView": true,
+      "AllowEdit": false,
+      "Filter": null
+    }
+  ],
+  "DefaultDockerImage": 0,
+  "AllowDockerImageChange": false,
+  "DockerImages": [
+    {
+      "DisplayName": "The Firts Images",
+      "Name": "ghcr.io/parkervcp/yolks:debian",
+      "AutoPull": true
+    }
+  ]
+}
