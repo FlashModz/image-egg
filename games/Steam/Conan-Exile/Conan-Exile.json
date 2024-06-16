@@ -1,7 +1,7 @@
 {
   "Name": "Conan-Exile",
   "Author": "FlashModz",
-  "UpdateUrl": null,
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/games/Steam/Conan-Exile/Conan-Exile.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "xvfb-run --auto-servernum wine /home/container/ConanSandbox/Binaries/Win64/ConanSandboxServer-Win64-Shipping.exe -Port={{SERVER_PORT}} -QueryPort={{QUERY_PORT}} -RconPort={{RCON_PORT}} -ServerName=\"{{SERVER_NAME}}\" -ServerPassword=\"{{SERVER_PASSWD}}\" -console -log",
   "OnlineDetection": "Started SourceServerQueries",
