@@ -1,0 +1,84 @@
+{
+  "Name": "Conan-Exile",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "xvfb-run --auto-servernum wine /home/container/ConanSandbox/Binaries/Win64/ConanSandboxServer-Win64-Shipping.exe -Port={{SERVER_PORT}} -QueryPort={{QUERY_PORT}} -RconPort={{RCON_PORT}} -ServerName=\"{{SERVER_NAME}}\" -ServerPassword=\"{{SERVER_PASSWD}}\" -console -log",
+  "OnlineDetection": "Started SourceServerQueries",
+  "StopCommand": "^^C",
+  "InstallShell": "/bin/bash",
+  "InstallDockerImage": "debian:latest",
+  "InstallScript": "#! /bin/bash\napt -y update\napt -y install curl lib32gcc-s1 ca-certificates\nif [[ \"${STEAM_USER}\" == \"\" ]] || [[ \"${STEAM_PASS}\" == \"\" ]]; then   \n\techo -e \"steam user is empty.\"    \n\techo -e \"Back to anonymous user.\"    \n\tSTEAM_USER=anonymous   \n\tSTEAM_PASS=\"\"    \n\tSTEAM_AUTH=\"\"\n#else    \n#\techo -e \"User has been set to ${STEAM_USER}\"\nfi\n\nMAINTAINER=\"FlashModz\"\nPVERSION=\"1.0\"\n\necho \".###################################.\"\necho \".#      Install Project\"\necho -e \".#      Maintainer : ${MAINTAINER}\"\necho -e \".#      Version : ${PVERSION}\"\necho \".###################################.\"\n\n## DL SteamCMD\ncd /tmp\nmkdir -p /mnt/server/installtools/steamcmd\ncd /mnt/server/installtools/steamcmd\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\ntar -xzvf steamcmd.tar.gz -C ./\n\n## Set Permissions\nchown -R root:root /mnt\n\n## Set Env Vars\nexport HOME=/mnt/server\n\n./steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +@sSteamCmdForcePlatformType windows +app_update ${STEAM_APPID} validate +quit\n\n## set up 32 bit libraries\nmkdir -p /mnt/server/.steam/sdk32\ncp -v linux32/steamclient.so ../../.steam/sdk32/steamclient.so\n## set up 64 bit libraries\nmkdir -p /mnt/server/.steam/sdk64\ncp -v linux64/steamclient.so ../../.steam/sdk64/steamclient.so\n\n## Install Start\necho \".###################################.\"\necho \".#      Install Project\"\necho -e \".#      Maintainer : ${MAINTAINER}\"\necho -e \".#      Version : ${PVERSION}\"\necho \".###################################.\"\necho Done",
+  "ParseConfiguration": "[]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "STEAM_APPID",
+      "DefaultValue": "443030",
+      "DisplayName": "App ID",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "AUTO_UPDATE",
+      "DefaultValue": "1",
+      "DisplayName": "Enable Auto-Update",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "QUERY_PORT",
+      "DefaultValue": "27015",
+      "DisplayName": "Port Query",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "SERVER_NAME",
+      "DefaultValue": "",
+      "DisplayName": "Your Server Name",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "SERVER_PASSWD",
+      "DefaultValue": "",
+      "DisplayName": "Your Server Password",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "RCON_PORT",
+      "DefaultValue": "",
+      "DisplayName": "Port RCON",
+      "Description": "",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    }
+  ],
+  "DefaultDockerImage": 1,
+  "AllowDockerImageChange": true,
+  "DockerImages": [
+    {
+      "DisplayName": "DevOnly",
+      "Name": "flashmodz/moonlight:winedev",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "release",
+      "Name": "flashmodz/moonlight:wine_PROD",
+      "AutoPull": true
+    }
+  ]
+}
