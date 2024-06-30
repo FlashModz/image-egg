@@ -1,0 +1,87 @@
+{
+  "Name": "ticketpm",
+  "Author": "FlashModz",
+  "UpdateUrl": "",
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "npm i rimraf;npm install;npm_config_yes=true npx prisma db push;npm run build;node ${MAIN_FILE}",
+  "OnlineDetection": "Successfully registered application commands",
+  "StopCommand": "^C",
+  "InstallShell": "/bin/bash",
+  "InstallDockerImage": "debian:latest",
+  "InstallScript": "apt update\r\napt install -y git nodejs npm\r\necho -e \"Hello and Welcome!\"\r\necho -e \"NodeJS is now installing...\"\r\n\r\napt update && apt upgrade -y\r\necho -e \"updating npm. please wait...\"\r\nnpm_config_yes=true npm install npm@latest --location=global --force\r\n\r\nmkdir -p /mnt/server\r\ncd /mnt/server\r\ngit clone https://github.com/Sayrix/ticket-bot && mv ./ticket-bot/* ./\r\ncp ./config/config.example.jsonc ./config/config.jsonc\r\ntouch .env\r\n{\r\n        echo '  # Your discord token'\r\n        echo '  TOKEN=\"\"'\r\n        echo '  # Prisma Database URL (refer to docs https://doc.ticket.pm/docs/prisma)'\r\n        echo '  DATABASE_URL=\"file:./tixbot.db\"'\r\n} >> .env\r\n\r\necho \"Installing nodejs packages\"\r\n\r\nnpm_config_yes=true npx prisma db push\r\nnpm run build -y\r\necho -e \"NodeJS is now ready\"\r\nexit 0",
+  "ParseConfiguration": "[{\"Type\":\"file\",\"File\":\".env\",\"Configuration\":{\"TOKEN\":\"TOKEN=\\\"{{TOKEN}}\\\"\",\"DATABASE_URL\":\"DATABASE_URL=\\\"file:./tixbot.db\\\"\"}}]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "TOKEN",
+      "DefaultValue": "",
+      "DisplayName": "Your Token Discord",
+      "Description": "Please insert your Discord Bot Token",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "DATABASE_URL",
+      "DefaultValue": "file:./tixbot.db",
+      "DisplayName": "URL de la Database",
+      "Description": "Do not change, only if you use external DB, please follow (https://doc.ticket.pm/docs/prisma)",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "MAIN_FILE",
+      "DefaultValue": "dist/index.js",
+      "DisplayName": "Main File",
+      "Description": "The Main File like index.js",
+      "AllowView": false,
+      "AllowEdit": false,
+      "Filter": null
+    }
+  ],
+  "DefaultDockerImage": 1,
+  "AllowDockerImageChange": true,
+  "DockerImages": [
+    {
+      "DisplayName": "NodeJS 19",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs19",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 18",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs18",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 16",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs16",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 14",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs14",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 17",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs17",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 20",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs20",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 21",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs21",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "NodeJS 22",
+      "Name": "ghcr.io/tnsstudio-hq/moonlightdockerimages:nodejs22",
+      "AutoPull": true
+    }
+  ]
+}
