@@ -1,7 +1,7 @@
 {
   "Name": "ticketpm",
   "Author": "FlashModz",
-  "UpdateUrl": "",
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/bot/discordJS/PMTICKET.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "npm i rimraf;npm install;npm_config_yes=true npx prisma db push;npm run build;node ${MAIN_FILE}",
   "OnlineDetection": "Successfully registered application commands",
