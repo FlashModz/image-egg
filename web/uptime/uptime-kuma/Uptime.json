@@ -1,7 +1,7 @@
 {
   "Name": "Uptime",
   "Author": "FlashModz",
-  "UpdateUrl": null,
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/web/uptime/uptime-kuma/Uptime.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then npm run setup; fi; /usr/local/bin/node /home/container/server/server.js --port={{SERVER_PORT}}",
   "OnlineDetection": "Listening on",
