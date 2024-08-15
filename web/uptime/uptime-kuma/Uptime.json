@@ -1,0 +1,52 @@
+{
+  "Name": "Uptime",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then npm run setup; fi; /usr/local/bin/node /home/container/server/server.js --port={{SERVER_PORT}}",
+  "OnlineDetection": "Listening on",
+  "StopCommand": "^^C",
+  "InstallShell": "ash",
+  "InstallDockerImage": "node:current-alpine",
+  "InstallScript": "apk update\napk add --no-cache git curl jq file unzip make gcc g++ python3 python3-dev libtool\napk add --no-cache git-lfs --repository=https://dl-cdn.alpinelinux.org/alpine/latest-stable/community\nMAINTAINER=\"FlashModz\"\nPVERSION=\"1.0\"\n\n## npm update to latest\necho -e \"Updating npm to latest....\\n\"\nif [ -d \"/mnt/server/node_modules\" ]; then\n    rm -fR /mnt/server/node_modules\n    npm cache verify\nfi\nnpm install -g npm@latest\n\n## Uptime Kuma install & update\nmkdir -p /mnt/server\ncd /mnt/server\ngit config --global --add safe.directory /mnt/server\n\nif [ -d .git ]; then\n    echo -e \"Updating Uptime Kuma....\\n \"\n    npm run setup\nelse\n    echo -e \"Download and installing Uptime Kuma...\\n\"   \n    git clone https://github.com/louislam/uptime-kuma.git .\n    npm run setup\nfi\n\n## only create dir, when .git is present to prevent errors\nif [ -d .git ]; then\n    mkdir -p /mnt/server/data\nfi\n\nif [ ! -f \"/mnt/server/data/kuma.db\" ]; then\n    cp /mnt/server/db/kuma.db /mnt/server/data/kuma.db\nfi\n\n## install end\necho \".###################################.\"\necho \".#      Install Project\"\necho -e \".#      Maintainer : ${MAINTAINER}\"\necho -e \".#      Version : ${PVERSION}\"\necho \".###################################.\"\necho -e \"install complete with version : ${PVERSION}\"\nexit 0",
+  "ParseConfiguration": "[]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "GIT_ADDRESS",
+      "DefaultValue": "https://github.com/louislam/uptime-kuma",
+      "DisplayName": "Git Repo Address",
+      "Description": "GitHub Repo to clone  I.E. https://github.com/parkervcp/repo_name",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "nullable|string"
+    },
+    {
+      "Key": "JS_FILE",
+      "DefaultValue": "server/server.js",
+      "DisplayName": "JS file",
+      "Description": "The file that starts the app",
+      "AllowView": false,
+      "AllowEdit": false,
+      "Filter": "required|string"
+    },
+    {
+      "Key": "AUTO_UPDATE",
+      "DefaultValue": "1",
+      "DisplayName": "Auto Update",
+      "Description": "Activer la mise à jour auto ?",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|boolean"
+    }
+  ],
+  "DefaultDockerImage": 0,
+  "AllowDockerImageChange": false,
+  "DockerImages": [
+    {
+      "DisplayName": "Latest",
+      "Name": "flashmodz/moonlight:uptime",
+      "AutoPull": true
+    }
+  ]
+}
