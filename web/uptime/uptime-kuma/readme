@@ -1,8 +1,6 @@
+# Uptime Kuma | Moonlight Egg image
 
 ![Logo](https://github.com/louislam/uptime-kuma/raw/master/public/icon.svg)
-
-
-# Uptime Kuma | Moonlight Egg image
 
 ## Installation
 
@@ -15,7 +13,7 @@ Install uptime kuma on Moonlight Panel
 - Create a server (You can choose your ports)
 - Install the server
 - Run your server
-
+    
 ## Environment Variables
 
 No modification needed
@@ -23,4 +21,3 @@ No modification needed
 ## Authors
 
 - [@FlashModz](https://www.github.com/FlashModz)
-
