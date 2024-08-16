@@ -71,8 +71,8 @@
   "AllowDockerImageChange": false,
   "DockerImages": [
     {
-      "DisplayName": "The Firts Images",
-      "Name": "ghcr.io/parkervcp/yolks:debian",
+      "DisplayName": "Latest Game",
+      "Name": "flashmodz/moonlight:debian",
       "AutoPull": true
     }
   ]
