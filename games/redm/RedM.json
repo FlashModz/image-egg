@@ -1,0 +1,88 @@
+{
+  "Name": "RedM",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1 --library-path \"$(pwd)/alpine/usr/lib/v8/:$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/\" -- $(pwd)/alpine/opt/cfx-server/FXServer +set citizen_dir $(pwd)/alpine/opt/cfx-server/citizen/ +set sv_licenseKey {{CFX_LICENSE}} +set steam_webApiKey {{STEAM_WEBAPIKEY}} +set sv_maxplayers {{MAX_PLAYERS}} +set txAdminPort {{TXADMIN_PORT}} $( [ \"$TXADMIN_ENABLE\" == \"1\" ] || printf %s '+exec server.cfg' ) +set gamename rdr3",
+  "OnlineDetection": "succeeded. Welcome!",
+  "StopCommand": "^C",
+  "InstallShell": "/bin/bash",
+  "InstallDockerImage": "debian:latest",
+  "InstallScript": "#!/bin/ash\napt update -y\napt install -y tar xz-utils file jq curl git tar zip unzip\nMAINTAINER=\"FlashModz\"\nPVERSION=\"1.0\"\n\nif [ -d ./alpine ]; then\n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${REDM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version\"\n        exit 2\n    else\n        DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${REDM_VERSION}/fx.tar.xz)\n    fi\n    \n    echo -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\n    curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n    \n    echo \"Extracting fivem files\"\n    FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar xvf ${DOWNLOAD_LINK##*/}\n    else\n        echo -e \"A error occured. Exiting\"\n        exit 2\n    fi\n    \n    rm -rf ${DOWNLOAD_LINK##*/} run.sh\n    \n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"Upgrade complete with version : ${PVERSION}\"\nelse\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${REDM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version for your RedM Server\"\n        echo -e \"Retry the installation after !\"\n        exit 2\n    fi\n\n    mkdir -p /mnt/server/resources /mnt/server/logs/\n\n    cd /mnt/server\n\n    echo \"updating citizenfx resource files\"\n    git clone https://github.com/citizenfx/cfx-server-data.git /tmp\n    cp -Rf /tmp/resources/* resources/\n\n    DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${REDM_VERSION}/fx.tar.xz)\n\n    if [ ! -z \"${DOWNLOAD_LINK}\" ]; then\n        if curl --output /dev/null --silent --head --fail ${DOWNLOAD_LINK}; then\n            echo -e \"The download link is valid\"\n            CHECK_DOWNLOAD_LINK=${DOWNLOAD_LINK}\n        else\n            echo -e \"link is invalid closing out\"\n            exit 2\n        fi\n    fi\n\n    echo -e \"Running curl -sSL ${CHECK_DOWNLOAD_LINK} -o ${CHECK_DOWNLOAD_LINK##*/}\"\n\n    curl -sSL ${CHECK_DOWNLOAD_LINK} -o ${CHECK_DOWNLOAD_LINK##*/}\n\n    echo \"Extracting fivem files\"\n\n    FILETYPE=$(file -F ',' ${CHECK_DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar xvf ${CHECK_DOWNLOAD_LINK##*/}\n    else\n        echo -e \"unknown filetype. Exiting\"\n        exit 2\n    fi\n\n    rm -rf ${CHECK_DOWNLOAD_LINK##*/} run.sh\n\n    if [ -e server.cfg ]; then\n        echo \"server config file exists\"\n    else\n        echo \"Downloading default fivem config\"\n        curl https://raw.githubusercontent.com/FlashModz/image-egg/FiveM/games/FiveM/server.cfg >>server.cfg\n    fi\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"install complete with version : ${PVERSION}\"\nfi",
+  "ParseConfiguration": "[{\"Type\":\"file\",\"File\":\"server.cfg\",\"Configuration\":{\"endpoint_add_tcp\":\"endpoint_add_tcp \\\"0.0.0.0:{{server.build.default.port}}\\\"\",\"endpoint_add_udp\":\"endpoint_add_udp \\\"0.0.0.0:{{server.build.default.port}}\\\"\",\"sv_hostname\":\"sv_hostname \\\"{{server.build.env.SERVER_HOSTNAME}}\\\"\",\"sv_maxclients\":\"sv_maxclients {{server.build.env.MAX_PLAYERS}}\"}}]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "CFX_LICENSE",
+      "DefaultValue": "",
+      "DisplayName": "CFX license",
+      "Description": "Required to start the service. Get your keys at https://keymaster.fivem.net/",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|string"
+    },
+    {
+      "Key": "MAX_PLAYERS",
+      "DefaultValue": "48",
+      "DisplayName": "Max Players",
+      "Description": "Set the fivem max play count",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|integer|between:1,1024"
+    },
+    {
+      "Key": "SERVER_HOSTNAME",
+      "DefaultValue": "My new Moonlight Server",
+      "DisplayName": "Server Hostname",
+      "Description": "The name that shows up in the server browser",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|string"
+    },
+    {
+      "Key": "REDM_VERSION",
+      "DefaultValue": "8981-e9195782416dcdb424e74d438b940a212f6ac316",
+      "DisplayName": "RedM Server Version",
+      "Description": "The CFX Server version that is to be installed. Invalid versions will default to latest.  an example is `1383-e5ea040353ce1b8bc86e37982bf5d888938e3096`  You can the latest version from here - https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|string|max:90"
+    },
+    {
+      "Key": "STEAM_WEBAPIKEY",
+      "DefaultValue": "none",
+      "DisplayName": "Steam Web Api Key",
+      "Description": "Use your Steam WebApiKey or set to 'none'. Get your key at https://steamcommunity.com/dev/apikey/",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|string"
+    },
+    {
+      "Key": "TXADMIN_ENABLE",
+      "DefaultValue": "1",
+      "DisplayName": "Enable TxAdmin",
+      "Description": "Do you want enable TXADMIN ?",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    },
+    {
+      "Key": "TXADMIN_PORT",
+      "DefaultValue": "",
+      "DisplayName": "TxAdmin Port",
+      "Description": "Set your TxAdmin port",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": null
+    }
+  ],
+  "DefaultDockerImage": 0,
+  "AllowDockerImageChange": false,
+  "DockerImages": [
+    {
+      "DisplayName": "Latest Game",
+      "Name": "flashmodz/moonlight:debian",
+      "AutoPull": true
+    }
+  ]
+}
