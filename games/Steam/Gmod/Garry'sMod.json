@@ -1,0 +1,97 @@
+{
+  "Name": "Garry's Mod",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "./srcds_run -game garrysmod +sv_setsteamaccount {{STEAM_ACC}} -console +ip 0.0.0.0 -port {{SERVER_PORT}} +map {{SRCDS_MAP}} +gamemode {{GAMEMODE}} -strictportbind +maxplayers {{MAX_PLAYERS}} -tickrate {{TICKRATE}} $( [ \"$LUA_REFRESH\" == \"1\" ] || printf %s '-disableluarefresh' ) +host_workshop_collection {{WORKSHOP_ID}}",
+  "OnlineDetection": "gameserver Steam ID",
+  "StopCommand": "quit",
+  "InstallShell": "/bin/bash",
+  "InstallDockerImage": "ubuntu:22.04",
+  "InstallScript": "#!/bin/bash\n# steamcmd Base Installation Script\n#\n# Server Files: /mnt/server\n# Image to install with is 'debian:buster-slim'\napt -y update\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates zip unzip\n\n## just in case someone removed the defaults.\nif [ \"${STEAM_USER}\" == \"\" ]; then\n    echo -e \"steam user is not set.\\n\"\n    echo -e \"Using anonymous user.\\n\"\n    STEAM_USER=anonymous\n    STEAM_PASS=\"\"\n    STEAM_AUTH=\"\"\nelse\n    echo -e \"user set to ${STEAM_USER}\"\nfi\nFIRST_ISSUE_VISUAL=\"232250\"\nFIRST_ISSUE_VISUAL_DIR=\"/mnt/server/content/tf2\"\nMAINTAINER=\"flashmodz\"\nPVERSION=\"1.0.1\"\n\n\n## download and install steamcmd\ncd /tmp\nmkdir -p /mnt/server/steamcmd\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\nmkdir -p /mnt/server/steamapps # Fix steamcmd disk write error when this folder is missing\ncd /mnt/server/steamcmd\n\n# SteamCMD fails otherwise for some reason, even running as root.\n# This is changed at the end of the install process anyways.\nchown -R root:root /mnt\nexport HOME=/mnt/server\n\n## install game using steamcmd \n./steamcmd.sh +login anonymous +force_install_dir /mnt/server +app_update ${SRCDS_APPID} ${EXTRA_FLAGS} validate +quit\n\n## install game using steamcmd (Commented because too old and not optimised for linux)\n## ./steamcmd.sh +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} $( [[ \"${WINDOWS_INSTALL}\" == \"1\" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) +force_install_dir /mnt/server +app_update ${SRCDS_APPID} ${EXTRA_FLAGS} validate +quit ## other flags may be needed depending on install. looking at you cs 1.6\n\n## Install other source needed (Potentiel visual issues)\n## ./steamcmd.sh +login anonymous +force_install_dir ${FIRST_ISSUE_VISUAL_DIR} +app_update ${FIRST_ISSUE_VISUAL} ${EXTRA_FLAGS} validate +quit\n\n## set up 32 bit libraries\nmkdir -p /mnt/server/.steam/sdk32\ncp -v linux32/steamclient.so ../.steam/sdk32/steamclient.so\n\n## set up 64 bit libraries\nmkdir -p /mnt/server/.steam/sdk64\ncp -v linux64/steamclient.so ../.steam/sdk64/steamclient.so\n\nif [ -d /mnt/server/content/css/css-content-gmodcontent ]; then\n    echo \"Content exist - Ignore it now\"\nelse\n    mkdir /mnt/server/content/\n    mkdir /mnt/server/content/css/\n    cd /mnt/server/content/css/\n    curl -sSL -o css.zip https://zdev.fr/dl-jeuxeggs/css-content-gmodcontent.zip\n    unzip css.zip -d /mnt/server/content/css/\n    rm -f css.zip\nfi\n\nif [ -d /mnt/server/content/tf2/materials ]; then\n    echo \"Content exist - Ignore it now\"\nelse\n    mkdir /mnt/server/content/tf2/\n    cd /mnt/server/content/tf2/\n    curl -sSL -o tf2.zip https://zdev.fr/dl-jeuxeggs/tf2-content-gmodcontent.zip\n    unzip tf2.zip -d /mnt/server/content/tf2/\n    rm -f tf2.zip\nfi\n\nif [ -d /mnt/server/garrysmod/gamemodes/darkrp/ ]; then\n    echo \"Gamemode exist - Ignore it now\"\nelse\n    cd /mnt/server/garrysmod/gamemodes/\n    curl -sSL -o darkrp.zip https://github.com/FPtje/DarkRP/archive/refs/heads/master.zip\n    unzip darkrp.zip -d /mnt/server/garrysmod/gamemodes\n    rm -f darkrp.zip\n    mv DarkRP-master darkrp\nfi\n\n# Creating needed default files for the game\ncd /mnt/server/garrysmod/lua/autorun/server\necho '\n-- Docs: https://wiki.garrysmod.com/page/resource/AddWorkshop\n-- Place the ID of the workshop addon you want to be downloaded to people who join your server, not the collection ID\n-- Use https://beta.configcreator.com/create/gmod/resources.lua to easily create a list based on your collection ID\n\n-- This is the DarkRP WorkShop ID\n-- resource.AddWorkshop( \"248302805\" )\n\nresource.AddWorkshop( \"\" )\n' > workshop.lua\n\ncd /mnt/server/garrysmod/cfg\necho '\n\n//\n// Use this file to mount additional paths to the filesystem\n// The folder you provide must contain either one or more *_dir.vpk files or the usual models/materials/etc folders\n// Lines starting with // are comments and are ignored by the game\n// This file will also affect Hammer Editor (hammer.exe)\n//\n\n// DO NOT add a slash to the end of the filename\n// DO NOT start lines with // in between { and }, the 2 lines there are commented out examples and will be ignored by the game\n\n\"mountcfg\"\n{\n\"cstrike\"\t\"/home/container/content/css/css-content-gmodcontent/\"\n\"tf\"\t\t\"/home/container/content/tf2\"\n}\n\n// DO NOT start lines with // in between { and }, the 2 lines there are commented out examples and will be ignored by the game\n' > mount.cfg\n\ncd /mnt/server/garrysmod/cfg\necho '\n// Please do not set RCon in here, use the startup parameters.\n\n// Base Configuration\nhostname \"FR Host by GameHostfr\"\nsv_password \"mySecurePwd\"\nrcon_password \"myRcOnPwdSecure\"\n\n// Network Configuration\nsv_downloadurl \"\"\nsv_allowdownload 1\nsv_allowupload 0\nnet_maxfilesize 2048\nsv_loadingurl   \"\"\nsv_minrate\t\t75000\nsv_maxrate\t\t0\ngmod_physiterations\t2\nnet_splitpacket_maxrate\t45000\ndecalfrequency\t\t12\n\n// Logging Configuration\nlog on\nsv_logbans 1\nsv_logecho 0\nsv_logfile 1\nsv_log_onefile 0\n\n// Steam Server List Settings\nsv_region \"3\"\nsv_location \"fr\"\nsv_lan \"0\"\nsv_max_queries_sec_global \"30000\"\nsv_max_queries_window \"45\"\nsv_max_queries_sec \"5\"\n\n// Server Configuration\nsbox_noclip 0\nsbox_godmode 0\nsbox_playershurtplayers 1\nsbox_maxprops 64\nsbox_maxragdolls 32\nsbox_maxnpcs 0\nsbox_maxballoons 5\nsbox_maxeffects 5\nsbox_maxdynamite 0\nsbox_maxlamps 10\nsbox_maxthrusters 0\nsbox_maxwheels 0\nsbox_maxhoverballs 0\nsbox_maxvehicles 0\nsbox_maxbuttons 4\nsbox_maxemitters 4\n\n// Execute Ban Files - Please do not edit\nexec banned_ip.cfg\nexec banned_user.cfg\n\n// Add custom lines under here\n' > server.cfg\n\n## chmod -R 750 /mnt/server/\n\necho \".###################################.\"\necho \".#      Install complete\"\necho -e \".#      Maintainer : ${MAINTAINER}\"\necho \".###################################.\"\necho -e \"install complete with version : ${PVERSION}\"",
+  "ParseConfiguration": "[]",
+  "AllocationsNeeded": 1,
+  "Variables": [
+    {
+      "Key": "SRCDS_MAP",
+      "DefaultValue": "gm_flatgrass",
+      "DisplayName": "MAP",
+      "Description": "Define the map for your server",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|string|alpha_dash"
+    },
+    {
+      "Key": "STEAM_ACC",
+      "DefaultValue": "",
+      "DisplayName": "API Steam Account",
+      "Description": "You need to write your API, you can create one on : https://steamcommunity.com/dev/managegameservers",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": ""
+    },
+    {
+      "Key": "SRCDS_APPID",
+      "DefaultValue": "4020",
+      "DisplayName": "App ID",
+      "Description": "The App ID of Gmod",
+      "AllowView": true,
+      "AllowEdit": false,
+      "Filter": "required|max:20"
+    },
+    {
+      "Key": "WORKSHOP_ID",
+      "DefaultValue": "3292539363",
+      "DisplayName": "WorkShop ID",
+      "Description": "Insert all ID from the workshop you want. ID separated by comma.",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required"
+    },
+    {
+      "Key": "GAMEMODE",
+      "DefaultValue": "darkrp",
+      "DisplayName": "GAMEMODE",
+      "Description": "Please write your gamemode",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required"
+    },
+    {
+      "Key": "MAX_PLAYERS",
+      "DefaultValue": "32",
+      "DisplayName": "MAX PLAYERS",
+      "Description": "Select the Max player",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "32;64;96;128;150;246;"
+    },
+    {
+      "Key": "TICKRATE",
+      "DefaultValue": "11",
+      "DisplayName": "TICKRATE",
+      "Description": "Set the desired tickrate you want for your server",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required"
+    },
+    {
+      "Key": "LUA_REFRESH",
+      "DefaultValue": "0",
+      "DisplayName": "LUA REFRESH",
+      "Description": "Do you allow the refresh LUA during your server is in running state ?",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required|boolean"
+    }
+  ],
+  "DefaultDockerImage": 0,
+  "AllowDockerImageChange": false,
+  "DockerImages": [
+    {
+      "DisplayName": "Debian by FlashModz",
+      "Name": "flashmodz/moonlight:debian",
+      "AutoPull": true
+    }
+  ]
+}
