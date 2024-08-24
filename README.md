@@ -1,2 +1,2 @@
 # image-egg
-This is a docker image for MoonLight
+This is a stars repository for MoonLight
