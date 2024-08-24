@@ -1,7 +1,7 @@
 {
   "Name": "Garry's Mod",
   "Author": "FlashModz",
-  "UpdateUrl": null,
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/games/Steam/Gmod/Garry'sMod.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "./srcds_run -game garrysmod +sv_setsteamaccount {{STEAM_ACC}} -console +ip 0.0.0.0 -port {{SERVER_PORT}} +map {{SRCDS_MAP}} +gamemode {{GAMEMODE}} -strictportbind +maxplayers {{MAX_PLAYERS}} -tickrate {{TICKRATE}} $( [ \"$LUA_REFRESH\" == \"1\" ] || printf %s '-disableluarefresh' ) +host_workshop_collection {{WORKSHOP_ID}}",
   "OnlineDetection": "gameserver Steam ID",
