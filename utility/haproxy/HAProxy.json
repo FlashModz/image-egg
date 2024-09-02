@@ -19,11 +19,6 @@
       "DisplayName": "HaProxy",
       "Name": "flashmodz/moonlight:haproxy",
       "AutoPull": true
-    },
-    {
-      "DisplayName": "test1",
-      "Name": "ghcr.io/numa-lab/docker-haproxy:latest",
-      "AutoPull": true
     }
   ]
 }
