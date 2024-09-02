@@ -1,0 +1,29 @@
+{
+  "Name": "HAProxy",
+  "Author": "FlashModz",
+  "UpdateUrl": null,
+  "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
+  "StartupCommand": "haproxy -W -db -f /home/container/haproxy/haproxy.cfg",
+  "OnlineDetection": "forked",
+  "StopCommand": "^C",
+  "InstallShell": "ash",
+  "InstallDockerImage": "alpine:latest",
+  "InstallScript": "#!/bin/bash\napk add curl\n\ncd /mnt/server\n\nif [ ! -f haproxy/haproxy.conf ]; then\n    echo -e \"Downloading haproxy.cfg\"\n    mkdir haproxy\n    curl -o haproxy/haproxy.cfg https://raw.githubusercontent.com/FlashModz/image-egg/main/utility/haproxy/haproxy.cfg\nfi",
+  "ParseConfiguration": "[]",
+  "AllocationsNeeded": 1,
+  "Variables": [],
+  "DefaultDockerImage": 0,
+  "AllowDockerImageChange": true,
+  "DockerImages": [
+    {
+      "DisplayName": "HaProxy",
+      "Name": "flashmodz/moonlight:haproxy",
+      "AutoPull": true
+    },
+    {
+      "DisplayName": "test1",
+      "Name": "ghcr.io/numa-lab/docker-haproxy:latest",
+      "AutoPull": true
+    }
+  ]
+}
