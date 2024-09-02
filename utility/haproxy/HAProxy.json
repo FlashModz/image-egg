@@ -1,7 +1,7 @@
 {
   "Name": "HAProxy",
   "Author": "FlashModz",
-  "UpdateUrl": null,
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/utility/haproxy/HAProxy.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "haproxy -W -db -f /home/container/haproxy/haproxy.cfg",
   "OnlineDetection": "forked",
