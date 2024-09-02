@@ -1,7 +1,7 @@
 {
   "Name": "Satisfactory",
   "Author": "FlashModz",
-  "UpdateUrl": null,
+  "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/games/Steam/Satisfactory/Satisfactory.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
   "StartupCommand": "./Engine/Binaries/Linux/*-Linux-Shipping FactoryGame ?listen -Port={{SERVER_PORT}} -ServerQueryPort={{QUERY_PORT}} -BeaconPort={{BEACON_PORT}} -multihome=0.0.0.0 $",
   "OnlineDetection": "Engine Initialization",
