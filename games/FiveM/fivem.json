@@ -8,27 +8,36 @@
   "StopCommand": "quit",
   "InstallShell": "/bin/bash",
   "InstallDockerImage": "debian:bookworm-slim",
-  "InstallScript": "#! /bin/bash\napt update\napt install -y tar xz-utils file jq git curl\nMAINTAINER=\"FlashModz\"\nPVERSION=\"1.0\"\n\nif [ -d ./alpine ]; then\n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${FIVEM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version\"\n        exit 2\n    else\n        DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)\n    fi\n    \n    echo -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\n    curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n    \n    echo \"Extracting fivem files\"\n    FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar xvf ${DOWNLOAD_LINK##*/}\n    else\n        echo -e \"A error occured. Exiting\"\n        exit 2\n    fi\n    \n    rm -rf ${DOWNLOAD_LINK##*/} run.sh\n    \n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"Upgrade complete with version : ${PVERSION}\"\nelse\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    mkdir -p /mnt/server/resources\n    cd /mnt/server\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${FIVEM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version\"\n        exit 2\n    else\n        DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)\n    fi\n    \n    echo -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\n    curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n    \n    echo \"Extracting fivem files\"\n    FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar xvf ${DOWNLOAD_LINK##*/}\n    else\n        echo -e \"A error occured. Exiting\"\n        exit 2\n    fi\n    \n    rm -rf ${DOWNLOAD_LINK##*/} run.sh\n    \n    echo -e \"Downloading default server.cfg config file from github repository of maintainer : ${MAINTAINER}\"\n    curl https://raw.githubusercontent.com/FlashModz/image-egg/FiveM/games/FiveM/server.cfg >>server.cfg\n    \n    mkdir -p logs/\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"install complete with version : ${PVERSION}\"\nfi",
+  "InstallScript": "#! /bin/bash\napt update\napt install -y tar xz-utils file jq git curl\nMAINTAINER=\"FlashModz\"\nPVERSION=\"1.0\"\n\nif [ -d ./alpine ]; then\n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${FIVEM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version\"\n        exit 2\n    else\n        DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)\n    fi\n    \n    echo -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\n    curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n    \n    rm -Rf ./alpine/var/lock\n    \n    echo \"Extracting fivem files\"\n    FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar -Jxf ${DOWNLOAD_LINK##*/}\n    else\n        echo -e \"A error occured. Exiting\"\n        exit 2\n    fi\n    \n    rm -rf ${DOWNLOAD_LINK##*/} run.sh\n    \n    echo \".###################################.\"\n    echo \".#      Upgrade Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"Upgrade complete with version : ${PVERSION}\"\nelse\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    \n    mkdir -p /mnt/server/resources\n    cd /mnt/server\n    \n    echo \"Get/Set link with our selected version to download\"\n    if [[ \"${FIVEM_VERSION}\" == \"\" ]]; then\n        echo -e \"You Need to set an version\"\n        exit 2\n    else\n        DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)\n    fi\n    \n    echo -e \"Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\"\n    curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}\n    \n    echo \"Extracting fivem files\"\n    FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)\n    if [ \"$FILETYPE\" == \"XZ\" ]; then\n        tar xvf ${DOWNLOAD_LINK##*/}\n    else\n        echo -e \"A error occured. Exiting\"\n        exit 2\n    fi\n    \n    rm -rf ${DOWNLOAD_LINK##*/} run.sh\n    \n    echo -e \"Downloading default server.cfg config file from github repository of maintainer : ${MAINTAINER}\"\n    curl https://raw.githubusercontent.com/FlashModz/image-egg/FiveM/games/FiveM/server.cfg >>server.cfg\n    \n    mkdir -p logs/\n    echo \".###################################.\"\n    echo \".#      Install Project\"\n    echo -e \".#      Maintainer : ${MAINTAINER}\"\n    echo -e \".#      Version : ${PVERSION}\"\n    echo \".###################################.\"\n    echo -e \"install complete with version : ${PVERSION}\"\nfi",
   "ParseConfiguration": "[{\"Type\":\"file\",\"File\":\"server.cfg\",\"Configuration\":{\"sv_hostname\":\"sv_hostname \\\"{{FIVEM_HOSTNAME}}\\\"\",\"endpoint_add_tcp\":\"endpoint_add_tcp \\\"0.0.0.0:{{SERVER_PORT}}\\\"\",\"endpoint_add_udp\":\"endpoint_add_udp \\\"0.0.0.0:{{SERVER_PORT}}\\\"\",\"set sv_licenseKey\":\"set sv_licenseKey \\\"{{FIVEM_LICENSE}}\\\"\"}}]",
   "AllocationsNeeded": 1,
   "Variables": [
     {
-      "Key": "FIVEM_LICENSE",
-      "DefaultValue": "",
-      "DisplayName": "Your Fivem License",
-      "Description": "",
+      "Key": "TXADMIN_ENABLE",
+      "DefaultValue": "1",
+      "DisplayName": "Enable TxAdmin",
+      "Description": "Enable the TxAdmin panel to manage your FiveM Server.",
       "AllowView": true,
       "AllowEdit": true,
-      "Filter": null
+      "Filter": "required|boolean"
     },
     {
-      "Key": "MAX_PLAYERS",
-      "DefaultValue": "32",
-      "DisplayName": "Max Players",
-      "Description": "Set the fivem max players count for your server",
+      "Key": "TXADMIN_PORT",
+      "DefaultValue": "40120",
+      "DisplayName": "TxAdmin Port",
+      "Description": "You can connect to your TX admin at this URL : https://panel.flashmodz.fr:(YOUR PORT)",
       "AllowView": true,
-      "AllowEdit": false,
-      "Filter": null
+      "AllowEdit": true,
+      "Filter": "-"
+    },
+    {
+      "Key": "FIVEM_VERSION",
+      "DefaultValue": "9655-56f6e3871fc376378e895a9c2d2232cc45c30e18",
+      "DisplayName": "FiveM Build Version",
+      "Description": "The fivem version that is to be installed. - An example : 8552-7b609f5f63ca1ef211abde2fc0dc0d0a90cd9202 --> You can see all version from here - https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/",
+      "AllowView": true,
+      "AllowEdit": true,
+      "Filter": "required"
     },
     {
       "Key": "FIVEM_HOSTNAME",
@@ -37,41 +46,32 @@
       "Description": "The name of your server that shows up in the public server browser",
       "AllowView": true,
       "AllowEdit": true,
-      "Filter": null
+      "Filter": "required|string"
     },
     {
-      "Key": "FIVEM_VERSION",
-      "DefaultValue": "8552-7b609f5f63ca1ef211abde2fc0dc0d0a90cd9202",
-      "DisplayName": "FiveM Build Version",
-      "Description": "The fivem version that is to be installed. - An example : 8552-7b609f5f63ca1ef211abde2fc0dc0d0a90cd9202 --> You can see all version from here - https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/",
+      "Key": "MAX_PLAYERS",
+      "DefaultValue": "32",
+      "DisplayName": "Max Players",
+      "Description": "Set the fivem max players count for your server",
       "AllowView": true,
       "AllowEdit": true,
-      "Filter": null
+      "Filter": "required|integer|between:32,1024"
     },
     {
-      "Key": "TXADMIN_ENABLE",
-      "DefaultValue": "1",
-      "DisplayName": "Enable TxAdmin",
-      "Description": "Enable the TxAdmin panel to manage your FiveM Server.",
+      "Key": "FIVEM_LICENSE",
+      "DefaultValue": "",
+      "DisplayName": "Your Fivem License",
+      "Description": "You can find your licence on keymaster",
       "AllowView": true,
       "AllowEdit": true,
-      "Filter": null
-    },
-    {
-      "Key": "TXADMIN_PORT",
-      "DefaultValue": "40120",
-      "DisplayName": "TxAdmin Port",
-      "Description": "You can connect to your TX admin at this URL : https://panel.flashmodz.fr:(YOUR PORT)",
-      "AllowView": true,
-      "AllowEdit": false,
-      "Filter": null
+      "Filter": "required|string"
     }
   ],
   "DefaultDockerImage": 0,
   "AllowDockerImageChange": false,
   "DockerImages": [
     {
-      "DisplayName": "Latest Game",
+      "DisplayName": "PRODUCTION",
       "Name": "flashmodz/moonlight:debian",
       "AutoPull": true
     }
