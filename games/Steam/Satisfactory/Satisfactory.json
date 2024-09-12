@@ -3,33 +3,15 @@
   "Author": "FlashModz",
   "UpdateUrl": "https://raw.githubusercontent.com/FlashModz/image-egg/main/games/Steam/Satisfactory/Satisfactory.json",
   "DonateUrl": "https://www.paypal.com/donate/?hosted_button_id=3U34VWWBBQCUL",
-  "StartupCommand": "./Engine/Binaries/Linux/*-Linux-Shipping FactoryGame ?listen -Port={{SERVER_PORT}} -ServerQueryPort={{QUERY_PORT}} -BeaconPort={{BEACON_PORT}} -multihome=0.0.0.0 $",
+  "StartupCommand": "./Engine/Binaries/Linux/*-Linux-Shipping FactoryGame ?listen -Port={{SERVER_PORT}} -unattended -ini:Engine:[HTTPServer.Listeners]:DefaultBindAddress=any -ini:Engine:[Core.Log]:LogNet=Error -multihome -log",
   "OnlineDetection": "Engine Initialization",
   "StopCommand": "^C",
   "InstallShell": "/bin/bash",
   "InstallDockerImage": "debian:latest",
   "InstallScript": "#! /bin/bash\napt update\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates zip unzip\n## Download and install SteamCMD\ncd /tmp\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\nmkdir -p /mnt/server/steamcmd\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\ncd /mnt/server/steamcmd\n\n# SteamCMD fails otherwise for some reason, even running as root.\nchown -R root:root /mnt\nexport HOME=/mnt/server\n\n## install game using steamcmd \n./steamcmd.sh +force_install_dir /mnt/server +login anonymous +app_update ${SRCDS_APPID} validate +exit\n\n# Set up 32 and 64 bit libraries\nmkdir -p /mnt/server/.steam/sdk{32,64}\ncp -v linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so\ncp -v linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so\n\ncd /mnt/server/Engine/Binaries/Linux\ncount=$(find . -maxdepth 1 -name '*-Linux-Shipping' -type f -executable | wc -l)\nif [[ $count -eq 0 ]]; then\n    echo -e \"\\n\\nSteamCMD failed to install the Satisfactory Dedicated Server!\"\n    echo -e \"\\tTry reinstalling the server again.\\n\"\n    exit 1\nelse\n    chmod +x *-Linux-Shipping\nfi\n\necho -e \"\\nSatisfactory Dedicated Server successfully installed!\\n\"",
-  "ParseConfiguration": "[{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/Game.ini\",\"Configuration\":{\"MaxPlayers\":\"MaxPlayers=\\\"{{MAX_PLAYERS}}\\\"\"}},{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/Engine.ini\",\"Configuration\":{\"mNumRotatingAutosaves\":\"mNumRotatingAutosaves=\\\"{{NUM_AUTOSAVES}}\\\"\"}},{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/GameUserSettings.ini\",\"Configuration\":{\"mFloatValues\":\"mFloatValues=((\\\"FG.AutosaveInterval\\\", {{AUTOSAVE_INTERVAL}}))\",\"mIntValues\":\"mIntValues=((\\\"FG.NetworkQuality\\\", {{NETWORK_QUALITY}}))\"}}]",
+  "ParseConfiguration": "[{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/Game.ini\",\"Configuration\":{\"MaxPlayers\":\"MaxPlayers=\\\"{{MAX_PLAYERS}}\\\"\"}},{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/Engine.ini\",\"Configuration\":{\"mNumRotatingAutosaves\":\"mNumRotatingAutosaves=\\\"{{NUM_AUTOSAVES}}\\\"\"}},{\"Type\":\"file\",\"File\":\"FactoryGame/Saved/Config/LinuxServer/GameUserSettings.ini\",\"Configuration\":{\"mFloatValues\":\"mFloatValues=((\\\"FG.AutosaveInterval\\\", {{AUTOSAVE_INTERVAL}}))\"}}]",
   "AllocationsNeeded": 1,
   "Variables": [
-    {
-      "Key": "QUERY_PORT",
-      "DefaultValue": "15777",
-      "DisplayName": "Query Port",
-      "Description": "This is the port that your clients will type in and use to connect to the lobby",
-      "AllowView": true,
-      "AllowEdit": true,
-      "Filter": "required"
-    },
-    {
-      "Key": "BEACON_PORT",
-      "DefaultValue": "15000",
-      "DisplayName": "Beacon port",
-      "Description": "This port provides a lightweight way for clients to contact a server and interact with it without committing to a normal game connection (likely used for client administration)",
-      "AllowView": true,
-      "AllowEdit": true,
-      "Filter": "required"
-    },
     {
       "Key": "AUTO_UPDATE",
       "DefaultValue": "1",
@@ -47,15 +29,6 @@
       "AllowView": true,
       "AllowEdit": false,
       "Filter": "required"
-    },
-    {
-      "Key": "NETWORK_QUALITY",
-      "DefaultValue": "3",
-      "DisplayName": "Network Quality",
-      "Description": "[0 = Low, 1 = Medium, 2 = High, 3 = Ultra]",
-      "AllowView": true,
-      "AllowEdit": true,
-      "Filter": null
     },
     {
       "Key": "MAX_PLAYERS",
